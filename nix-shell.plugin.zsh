@@ -65,3 +65,20 @@ function nix-shell() {
     command nix-shell "$@"
   fi
 }
+
+function nix() {
+  local -a ARGS; ARGS=("$@")
+
+  if [[ $ARGS[1] =~ ^(shell|develop)$ ]]
+  then
+    NIX_SHELL_PACKAGES+="${NIX_SHELL_PACKAGES:+ }$ARGS[2]"
+
+    NIX_SHELL_PACKAGES="$NIX_SHELL_PACKAGES" \
+    NIX_BUILD_SHELL="$NIX_SHELL_PLUGIN_DIR/scripts/buildShellShim" \
+    NIX_EXECUTING_SHELL="$SHELL" \
+    IN_NIX_SHELL="flake" \
+    command nix "$@"
+  else
+    command nix "$@"
+  fi
+}
